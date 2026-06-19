@@ -25,6 +25,55 @@ In the output, you'll find options to open the app in a
 
 You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
 
+## Build a release APK locally (Android)
+
+### One-time setup
+
+Requires [Android Studio](https://developer.android.com/studio) (it provides the Android SDK + a bundled JDK 17+).
+
+Set these user environment variables (PowerShell), then **open a new terminal**:
+
+```powershell
+setx ANDROID_HOME "$env:LOCALAPPDATA\Android\Sdk"
+setx JAVA_HOME "C:\Program Files\Android\Android Studio\jbr"
+```
+
+Verify in the new terminal:
+
+```powershell
+java -version   # should report JDK 17+
+adb --version
+```
+
+### Build
+
+```powershell
+npm install
+npx expo prebuild --platform android   # generates the native android/ folder
+cd android
+.\gradlew.bat assembleRelease
+```
+
+The APK is written to:
+
+```
+android\app\build\outputs\apk\release\app-release.apk
+```
+
+Install it on a connected device with `adb install <path-to-apk>`.
+
+### Rebuilding after changes
+
+| What changed | Steps |
+|---|---|
+| JS/TS code, components, styles, assets | `cd android; .\gradlew.bat assembleRelease` (fast, cached) |
+| Added/removed an npm package | `npm install`, then `assembleRelease` |
+| `app.json` or a native module | `npx expo prebuild --platform android`, then `assembleRelease` |
+
+> `assembleRelease` reuses Gradle's cache (fast). `npx expo prebuild` regenerates the `android/` folder, so the following build is slower.
+>
+> The release APK is signed with a debug key — fine for testing/sideloading. Play Store distribution needs your own signing keystore.
+
 ## Running on Expo Go (Android) from GitHub Codespaces
 
 Since Codespaces runs in the cloud with no shared LAN, use tunnel mode to connect your Android device via Expo Go.
