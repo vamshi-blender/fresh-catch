@@ -1,5 +1,5 @@
 import * as Device from 'expo-device';
-import { Platform, StyleSheet } from 'react-native';
+import { Platform, Pressable, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { AnimatedIcon } from '@/components/animated-icon';
@@ -8,6 +8,8 @@ import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { WebBadge } from '@/components/web-badge';
 import { BottomTabInset, MaxContentWidth, Spacing } from '@/constants/theme';
+import { useAuth } from '@/hooks/use-auth';
+import { useTheme } from '@/hooks/use-theme';
 
 function getDevMenuHint() {
   if (Platform.OS === 'web') {
@@ -29,6 +31,8 @@ function getDevMenuHint() {
 }
 
 export default function HomeScreen() {
+  const theme = useTheme();
+  const { signOut } = useAuth();
   return (
     <ThemedView style={styles.container}>
       <SafeAreaView style={styles.safeArea}>
@@ -46,7 +50,7 @@ export default function HomeScreen() {
         <ThemedView type="backgroundElement" style={styles.stepContainer}>
           <HintRow
             title="Try editing"
-            hint={<ThemedText type="code">src/app/index.tsx</ThemedText>}
+            hint={<ThemedText type="code">src/app/(app)/index.tsx</ThemedText>}
           />
           <HintRow title="Dev tools" hint={getDevMenuHint()} />
           <HintRow
@@ -54,6 +58,15 @@ export default function HomeScreen() {
             hint={<ThemedText type="code">npm run reset-project</ThemedText>}
           />
         </ThemedView>
+
+        <Pressable
+          onPress={signOut}
+          style={({ pressed }) => [
+            styles.signOut,
+            { borderColor: theme.backgroundSelected, opacity: pressed ? 0.7 : 1 },
+          ]}>
+          <ThemedText type="smallBold">Sign out</ThemedText>
+        </Pressable>
 
         {Platform.OS === 'web' && <WebBadge />}
       </SafeAreaView>
@@ -87,6 +100,12 @@ const styles = StyleSheet.create({
   },
   code: {
     textTransform: 'uppercase',
+  },
+  signOut: {
+    paddingHorizontal: Spacing.three,
+    paddingVertical: Spacing.two,
+    borderRadius: Spacing.three,
+    borderWidth: StyleSheet.hairlineWidth,
   },
   stepContainer: {
     gap: Spacing.three,

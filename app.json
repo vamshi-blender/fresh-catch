@@ -11,10 +11,10 @@
       "icon": "./assets/expo.icon"
     },
     "android": {
-      "icon": "./assets/images/splash-logo.png",
+      "icon": "./assets/images/android-icon-foreground-padded.png",
       "adaptiveIcon": {
         "backgroundColor": "#FFFFFF",
-        "foregroundImage": "./assets/images/splash-logo.png"
+        "foregroundImage": "./assets/images/android-icon-foreground-padded.png"
       },
       "predictiveBackGestureEnabled": false,
       "package": "com.anonymous.freecatch"
@@ -33,7 +33,8 @@
           "imageWidth": 200,
           "resizeMode": "contain"
         }
-      ]
+      ],
+      "expo-secure-store"
     ],
     "experiments": {
       "typedRoutes": true,

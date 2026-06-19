@@ -26,6 +26,24 @@ export const Colors = {
 
 export type ThemeColor = keyof typeof Colors.light & keyof typeof Colors.dark;
 
+/**
+ * Brand palette from the design system (Figma). These are fixed brand colors,
+ * not theme-dependent, so they live separately from the light/dark `Colors`.
+ */
+export const Brand = {
+  /** Primary teal — headings, buttons, links. */
+  primary: '#004643',
+  /** Text/icon color on top of `primary`. */
+  onPrimary: '#FFFFFF',
+  /** Input borders and placeholder text. */
+  border: '#C4C4C4',
+  placeholder: '#C4C4C4',
+  /** Muted secondary text. */
+  muted: '#757575',
+  /** Field and screen backgrounds in the auth design. */
+  surface: '#FFFFFF',
+} as const;
+
 export const Fonts = Platform.select({
   ios: {
     /** iOS `UIFontDescriptorSystemDesignDefault` */
