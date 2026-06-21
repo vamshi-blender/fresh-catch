@@ -1,4 +1,3 @@
-import * as Device from 'expo-device';
 import { Platform, Pressable, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -11,25 +10,6 @@ import { BottomTabInset, MaxContentWidth, Spacing } from '@/constants/theme';
 import { useAuth } from '@/hooks/use-auth';
 import { useTheme } from '@/hooks/use-theme';
 
-function getDevMenuHint() {
-  if (Platform.OS === 'web') {
-    return <ThemedText type="small">use browser devtools</ThemedText>;
-  }
-  if (Device.isDevice) {
-    return (
-      <ThemedText type="small">
-        shake device or press <ThemedText type="code">m</ThemedText> in terminal
-      </ThemedText>
-    );
-  }
-  const shortcut = Platform.OS === 'android' ? 'cmd+m (or ctrl+m)' : 'cmd+d';
-  return (
-    <ThemedText type="small">
-      press <ThemedText type="code">{shortcut}</ThemedText>
-    </ThemedText>
-  );
-}
-
 export default function HomeScreen() {
   const theme = useTheme();
   const { signOut } = useAuth();
@@ -39,23 +19,26 @@ export default function HomeScreen() {
         <ThemedView style={styles.heroSection}>
           <AnimatedIcon />
           <ThemedText type="title" style={styles.title}>
-            Welcome to&nbsp;Expo
+            Welcome to Fresh Catch
           </ThemedText>
         </ThemedView>
 
         <ThemedText type="code" style={styles.code}>
-          get started
+          your seafood preferences are saved
         </ThemedText>
 
         <ThemedView type="backgroundElement" style={styles.stepContainer}>
           <HintRow
-            title="Try editing"
-            hint={<ThemedText type="code">src/app/(app)/index.tsx</ThemedText>}
+            title="Home"
+            hint={<ThemedText type="small">Your personalized dashboard starts here.</ThemedText>}
           />
-          <HintRow title="Dev tools" hint={getDevMenuHint()} />
           <HintRow
-            title="Fresh start"
-            hint={<ThemedText type="code">npm run reset-project</ThemedText>}
+            title="Explore"
+            hint={<ThemedText type="small">Browse app features from the Explore tab.</ThemedText>}
+          />
+          <HintRow
+            title="Preferences"
+            hint={<ThemedText type="small">Your likes, dislikes, and diet choices guide the app.</ThemedText>}
           />
         </ThemedView>
 

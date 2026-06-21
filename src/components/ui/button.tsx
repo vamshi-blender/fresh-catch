@@ -8,7 +8,7 @@ import {
   type ViewStyle,
 } from 'react-native';
 
-import { Brand, Fonts, Spacing } from '@/constants/theme';
+import { Brand, ControlSize, FontSize, Fonts, Radius, Spacing } from '@/constants/theme';
 
 type ButtonVariant = 'primary' | 'secondary';
 
@@ -60,8 +60,8 @@ export function Button({
 
 const styles = StyleSheet.create({
   base: {
-    height: 48,
-    borderRadius: 100,
+    height: ControlSize.button,
+    borderRadius: Radius.round,
     alignItems: 'center',
     justifyContent: 'center',
     paddingHorizontal: Spacing.four,
@@ -79,7 +79,7 @@ const styles = StyleSheet.create({
   },
   label: {
     fontFamily: Fonts.sans,
-    fontSize: 14,
+    fontSize: FontSize.body,
     fontWeight: '600',
   },
   primaryLabel: {

@@ -26,7 +26,7 @@ import {
 } from 'react';
 import { Platform } from 'react-native';
 
-const TOKEN_KEY = 'freecatch.session';
+const TOKEN_KEY = 'freshcatch.session';
 
 // Persisted only when the device is unlocked, and never copied to a new device
 // via backup. See SecureStore "keychainAccessible" options in the Expo docs.

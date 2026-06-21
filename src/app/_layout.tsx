@@ -1,26 +1,36 @@
+import '@/global.css';
+
 import { DarkTheme, DefaultTheme, Stack, ThemeProvider } from 'expo-router';
 import { useColorScheme } from 'react-native';
 
 import { AnimatedSplashOverlay } from '@/components/animated-icon';
 import { AuthProvider, useAuth } from '@/hooks/use-auth';
+import { PreferencesProvider, usePreferences } from '@/hooks/use-preferences';
 
-// Client-side route protection. When `isAuthenticated` flips, Expo Router
-// automatically redirects to the first available screen, so the login and app
-// groups never need manual navigation. See:
+// Client-side route protection. When guards flip, Expo Router automatically
+// redirects to the first available screen — no manual navigation needed. See:
 // https://docs.expo.dev/router/advanced/protected/
 function RootNavigator() {
-  const { isAuthenticated, isLoading } = useAuth();
+  const { isAuthenticated, isLoading: authLoading } = useAuth();
+  const { hasCompletedOnboarding, isLoading: prefsLoading } = usePreferences();
 
-  // Keep the splash up until the persisted session has been restored, so we
-  // don't flash the login screen for an already-signed-in user.
-  if (isLoading) return null;
+  // Wait for auth restore. For authenticated users, also wait for preferences
+  // so we never briefly flash the wrong screen.
+  if (authLoading || (isAuthenticated && prefsLoading)) return null;
 
   return (
     <Stack screenOptions={{ headerShown: false }}>
-      <Stack.Protected guard={isAuthenticated}>
+      {/* Main app — authenticated users who have completed onboarding. */}
+      <Stack.Protected guard={isAuthenticated && hasCompletedOnboarding}>
         <Stack.Screen name="(app)" />
       </Stack.Protected>
 
+      {/* Onboarding — authenticated first-time users. */}
+      <Stack.Protected guard={isAuthenticated && !hasCompletedOnboarding}>
+        <Stack.Screen name="preferences" />
+      </Stack.Protected>
+
+      {/* Auth — unauthenticated users. */}
       <Stack.Protected guard={!isAuthenticated}>
         <Stack.Screen name="login" />
       </Stack.Protected>
@@ -33,8 +43,10 @@ export default function RootLayout() {
   return (
     <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
       <AuthProvider>
-        <AnimatedSplashOverlay />
-        <RootNavigator />
+        <PreferencesProvider>
+          <AnimatedSplashOverlay />
+          <RootNavigator />
+        </PreferencesProvider>
       </AuthProvider>
     </ThemeProvider>
   );

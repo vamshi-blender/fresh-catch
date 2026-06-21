@@ -1,11 +1,11 @@
 {
   "expo": {
-    "name": "freecatch",
-    "slug": "freecatch",
+    "name": "Fresh Catch",
+    "slug": "fresh-catch",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/splash-logo.png",
-    "scheme": "freecatch",
+    "scheme": "freshcatch",
     "userInterfaceStyle": "automatic",
     "ios": {
       "icon": "./assets/expo.icon"
@@ -17,7 +17,7 @@
         "foregroundImage": "./assets/images/android-icon-foreground-padded.png"
       },
       "predictiveBackGestureEnabled": false,
-      "package": "com.anonymous.freecatch"
+      "package": "com.anonymous.freshcatch"
     },
     "web": {
       "output": "static",

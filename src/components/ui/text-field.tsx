@@ -11,9 +11,9 @@ import {
   type ViewStyle,
 } from 'react-native';
 
-import { Brand, Fonts } from '@/constants/theme';
+import { Brand, ControlSize, FontSize, Fonts, Radius, Spacing } from '@/constants/theme';
 
-export type TextFieldProps = TextInputProps & {
+export type TextFieldProps = Omit<TextInputProps, 'multiline' | 'numberOfLines'> & {
   /** Label rendered above the field. */
   label?: string;
   /**
@@ -72,21 +72,21 @@ export function TextField({
 const styles = StyleSheet.create({
   label: {
     fontFamily: Fonts.sans,
-    fontSize: 14,
+    fontSize: FontSize.body,
     fontWeight: '600',
-    color: '#000000',
-    marginBottom: 8,
+    color: Brand.text,
+    marginBottom: Spacing.two,
   },
   field: {
-    height: 48,
-    borderRadius: 8,
+    height: ControlSize.input,
+    borderRadius: Radius.small,
     borderWidth: 1,
     borderColor: Brand.border,
     backgroundColor: Brand.surface,
-    paddingHorizontal: 16,
+    paddingHorizontal: Spacing.three,
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
+    gap: Spacing.two,
   },
   disabled: {
     opacity: 0.6,
@@ -94,7 +94,7 @@ const styles = StyleSheet.create({
   input: {
     flex: 1,
     fontFamily: Fonts.sans,
-    fontSize: 14,
-    color: '#000000',
+    fontSize: FontSize.body,
+    color: Brand.text,
   },
 });

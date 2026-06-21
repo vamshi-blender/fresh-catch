@@ -2,9 +2,6 @@
  * Below are the colors that are used in the app. The colors are defined in the light and dark mode.
  * There are many other ways to style your app. For example, [Nativewind](https://www.nativewind.dev/), [Tamagui](https://tamagui.dev/), [unistyles](https://reactnativeunistyles.vercel.app), etc.
  */
-
-import '@/global.css';
-
 import { Platform } from 'react-native';
 
 export const Colors = {
@@ -33,6 +30,7 @@ export type ThemeColor = keyof typeof Colors.light & keyof typeof Colors.dark;
 export const Brand = {
   /** Primary teal — headings, buttons, links. */
   primary: '#004643',
+  text: '#000000',
   /** Text/icon color on top of `primary`. */
   onPrimary: '#FFFFFF',
   /** Input borders and placeholder text. */
@@ -40,6 +38,7 @@ export const Brand = {
   placeholder: '#C4C4C4',
   /** Muted secondary text. */
   muted: '#757575',
+  danger: '#e5484d',
   /** Field and screen backgrounds in the auth design. */
   surface: '#FFFFFF',
 } as const;
@@ -77,6 +76,38 @@ export const Spacing = {
   four: 24,
   five: 32,
   six: 64,
+} as const;
+
+export const FontSize = {
+  xsmall: 12,
+  small: 13,
+  body: 14,
+  default: 16,
+  heading: 20,
+  subtitle: 32,
+  title: 48,
+} as const;
+
+export const LineHeight = {
+  body: 20,
+  default: 24,
+  link: 30,
+  subtitle: 44,
+  title: 52,
+} as const;
+
+export const Radius = {
+  small: Spacing.two,
+  medium: Spacing.three,
+  round: 100,
+} as const;
+
+export const ControlSize = {
+  icon: 48,
+  input: 48,
+  textArea: 96,
+  button: 48,
+  checkbox: 24,
 } as const;
 
 export const BottomTabInset = Platform.select({ ios: 50, android: 80 }) ?? 0;

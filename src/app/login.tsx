@@ -14,7 +14,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { Button } from '@/components/ui/button';
 import { TextField } from '@/components/ui/text-field';
-import { Brand, Fonts, Spacing } from '@/constants/theme';
+import { Brand, ControlSize, FontSize, Fonts, LineHeight, Spacing } from '@/constants/theme';
 import { useAuth } from '@/hooks/use-auth';
 
 const logo = require('@/assets/images/auth/logo.png');
@@ -216,7 +216,7 @@ const styles = StyleSheet.create({
   },
   heading: {
     fontFamily: Fonts.sans,
-    fontSize: 20,
+    fontSize: FontSize.heading,
     fontWeight: '600',
     color: Brand.primary,
     textAlign: 'center',
@@ -235,9 +235,9 @@ const styles = StyleSheet.create({
     marginTop: Spacing.three,
   },
   checkbox: {
-    width: 24,
-    height: 24,
-    borderRadius: 12,
+    width: ControlSize.checkbox,
+    height: ControlSize.checkbox,
+    borderRadius: ControlSize.checkbox / 2,
     borderWidth: 1,
     borderColor: Brand.border,
     alignItems: 'center',
@@ -250,10 +250,10 @@ const styles = StyleSheet.create({
   termsText: {
     flex: 1,
     fontFamily: Fonts.sans,
-    fontSize: 14,
+    fontSize: FontSize.body,
     fontWeight: '500',
     color: Brand.muted,
-    lineHeight: 20,
+    lineHeight: LineHeight.body,
   },
   termsLink: {
     fontWeight: '600',
@@ -262,9 +262,9 @@ const styles = StyleSheet.create({
   error: {
     alignSelf: 'stretch',
     marginTop: Spacing.three,
-    color: '#e5484d',
+    color: Brand.danger,
     fontFamily: Fonts.sans,
-    fontSize: 14,
+    fontSize: FontSize.body,
   },
   submit: {
     alignSelf: 'stretch',
@@ -272,7 +272,7 @@ const styles = StyleSheet.create({
   },
   divider: {
     fontFamily: Fonts.sans,
-    fontSize: 12,
+    fontSize: FontSize.xsmall,
     color: Brand.muted,
     textAlign: 'center',
     marginTop: Spacing.four,
@@ -284,15 +284,15 @@ const styles = StyleSheet.create({
     marginTop: Spacing.three,
   },
   socialButton: {
-    width: 48,
-    height: 48,
+    width: ControlSize.icon,
+    height: ControlSize.icon,
   },
   socialButtonPressed: {
     opacity: 0.7,
   },
   socialIcon: {
-    width: 48,
-    height: 48,
+    width: ControlSize.icon,
+    height: ControlSize.icon,
   },
   footer: {
     flexDirection: 'row',
@@ -303,12 +303,12 @@ const styles = StyleSheet.create({
   },
   footerText: {
     fontFamily: Fonts.sans,
-    fontSize: 12,
+    fontSize: FontSize.xsmall,
     color: Brand.muted,
   },
   footerLink: {
     fontFamily: Fonts.sans,
-    fontSize: 12,
+    fontSize: FontSize.xsmall,
     fontWeight: '600',
     color: Brand.primary,
   },
