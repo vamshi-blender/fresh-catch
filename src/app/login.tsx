@@ -15,6 +15,9 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Button } from '@/components/ui/button';
 import { TextField } from '@/components/ui/text-field';
 import { Brand, ControlSize, FontSize, Fonts, LineHeight, Spacing } from '@/constants/theme';
+import { AuthFormRenderer } from '@/features/auth/auth-form-renderer';
+import { type AuthFieldId } from '@/features/auth/auth-form-schema';
+import { useAuthFormSchema } from '@/features/auth/use-auth-form-schema';
 import { useAuth } from '@/hooks/use-auth';
 
 const logo = require('@/assets/images/auth/logo.png');
@@ -30,13 +33,17 @@ const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export default function LoginScreen() {
   const { signIn, signUp } = useAuth();
+  const { schema } = useAuthFormSchema();
 
   const [mode, setMode] = useState<Mode>('sign-up');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
+  const [fieldValues, setFieldValues] = useState<Record<AuthFieldId, string>>({
+    email: '',
+    password: '',
+    confirmPassword: '',
+  });
   const [agreed, setAgreed] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [notice, setNotice] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
   const isSignUp = mode === 'sign-up';
@@ -44,33 +51,67 @@ export default function LoginScreen() {
   function switchMode() {
     setMode((m) => (m === 'sign-up' ? 'sign-in' : 'sign-up'));
     setError(null);
-    setConfirmPassword('');
+    setNotice(null);
+  }
+
+  function setFieldValue(fieldId: AuthFieldId, value: string) {
+    setFieldValues((current) => ({ ...current, [fieldId]: value }));
+  }
+
+  function validateSignUpFields() {
+    for (const field of schema.signUp.fields) {
+      const value = fieldValues[field.id] ?? '';
+
+      if (field.required && !value.trim()) {
+        return `Enter ${field.label.toLowerCase()}.`;
+      }
+      if (field.minLength && value.length < field.minLength) {
+        return `${field.label} must be at least ${field.minLength} characters.`;
+      }
+      if (field.matches && value !== fieldValues[field.matches]) {
+        return `${field.label} does not match.`;
+      }
+    }
+
+    return null;
   }
 
   async function handleSubmit() {
-    const normalizedEmail = email.trim().toLowerCase();
+    const normalizedEmail = fieldValues.email.trim().toLowerCase();
 
     if (!EMAIL_REGEX.test(normalizedEmail)) {
       return setError('Enter a valid email address.');
     }
-    if (password.length < MIN_PASSWORD_LENGTH) {
+    if (!isSignUp && fieldValues.password.length < MIN_PASSWORD_LENGTH) {
       return setError(`Password must be at least ${MIN_PASSWORD_LENGTH} characters.`);
     }
-    if (isSignUp && password !== confirmPassword) {
-      return setError('Passwords do not match.');
+    if (isSignUp) {
+      const validationError = validateSignUpFields();
+      if (validationError) return setError(validationError);
     }
     if (isSignUp && !agreed) {
       return setError('Please agree to the User Agreement and Privacy Policy.');
     }
 
     setError(null);
+    setNotice(null);
     setSubmitting(true);
     try {
-      // On success the auth state flips and the protected route in the root
-      // layout redirects automatically — no manual navigation needed.
-      await (isSignUp ? signUp(normalizedEmail, password) : signIn(normalizedEmail, password));
-    } catch {
-      setError('Something went wrong. Please try again.');
+      if (isSignUp) {
+        const result = await signUp(normalizedEmail, fieldValues.password);
+        if (result.needsEmailConfirmation) {
+          setNotice('Check your email to confirm your account, then sign in.');
+          setMode('sign-in');
+        }
+      } else {
+        await signIn(normalizedEmail, fieldValues.password);
+      }
+    } catch (caughtError) {
+      setError(
+        caughtError instanceof Error
+          ? caughtError.message
+          : 'Something went wrong. Please try again.',
+      );
     } finally {
       setSubmitting(false);
     }
@@ -88,47 +129,46 @@ export default function LoginScreen() {
             showsVerticalScrollIndicator={false}>
             <Image source={logo} style={styles.logo} contentFit="contain" />
 
-            <Text style={styles.heading}>{isSignUp ? 'Create new account' : 'Welcome back'}</Text>
+            <Text style={styles.heading}>
+              {isSignUp ? schema.signUp.title : 'Welcome back'}
+            </Text>
 
             <View style={styles.fields}>
-              <TextField
-                label="Email Address"
-                placeholder="Enter your email address"
-                value={email}
-                onChangeText={setEmail}
-                keyboardType="email-address"
-                autoCapitalize="none"
-                autoCorrect={false}
-                autoComplete="email"
-                textContentType="emailAddress"
-                inputMode="email"
-                editable={!submitting}
-              />
-
-              <TextField
-                label="Password"
-                placeholder="Enter your password"
-                value={password}
-                onChangeText={setPassword}
-                password
-                autoCapitalize="none"
-                autoComplete={isSignUp ? 'new-password' : 'current-password'}
-                textContentType={isSignUp ? 'newPassword' : 'password'}
-                editable={!submitting}
-              />
-
-              {isSignUp && (
-                <TextField
-                  label="Confirm Password"
-                  placeholder="Enter your confirm password"
-                  value={confirmPassword}
-                  onChangeText={setConfirmPassword}
-                  password
-                  autoCapitalize="none"
-                  autoComplete="new-password"
-                  textContentType="newPassword"
+              {isSignUp ? (
+                <AuthFormRenderer
+                  fields={schema.signUp.fields}
+                  values={fieldValues}
+                  onChangeValue={setFieldValue}
                   editable={!submitting}
                 />
+              ) : (
+                <>
+                  <TextField
+                    label="Email Address"
+                    placeholder="Enter your email address"
+                    value={fieldValues.email}
+                    onChangeText={(value) => setFieldValue('email', value)}
+                    keyboardType="email-address"
+                    autoCapitalize="none"
+                    autoCorrect={false}
+                    autoComplete="email"
+                    textContentType="emailAddress"
+                    inputMode="email"
+                    editable={!submitting}
+                  />
+
+                  <TextField
+                    label="Password"
+                    placeholder="Enter your password"
+                    value={fieldValues.password}
+                    onChangeText={(value) => setFieldValue('password', value)}
+                    password
+                    autoCapitalize="none"
+                    autoComplete="current-password"
+                    textContentType="password"
+                    editable={!submitting}
+                  />
+                </>
               )}
             </View>
 
@@ -149,9 +189,10 @@ export default function LoginScreen() {
             )}
 
             {error && <Text style={styles.error}>{error}</Text>}
+            {notice && <Text style={styles.notice}>{notice}</Text>}
 
             <Button
-              label={isSignUp ? 'Sign up' : 'Sign in'}
+              label={isSignUp ? schema.signUp.submitLabel : 'Sign in'}
               onPress={handleSubmit}
               loading={submitting}
               style={styles.submit}
@@ -263,6 +304,13 @@ const styles = StyleSheet.create({
     alignSelf: 'stretch',
     marginTop: Spacing.three,
     color: Brand.danger,
+    fontFamily: Fonts.sans,
+    fontSize: FontSize.body,
+  },
+  notice: {
+    alignSelf: 'stretch',
+    marginTop: Spacing.three,
+    color: Brand.primary,
     fontFamily: Fonts.sans,
     fontSize: FontSize.body,
   },

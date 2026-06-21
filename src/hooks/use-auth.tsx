@@ -1,20 +1,4 @@
-/**
- * Minimal authentication state for the app.
- *
- * The session token is persisted with `expo-secure-store` on native platforms
- * (iOS Keychain / Android Keystore-encrypted storage) as recommended by the
- * Expo authentication guide: https://docs.expo.dev/develop/authentication/
- *
- * SecureStore is native-only, so we fall back to `localStorage` on web purely
- * so the web build doesn't crash during development. Browser localStorage is
- * NOT secure storage — a real web deployment should use an httpOnly cookie set
- * by the server instead.
- *
- * `signIn`/`signUp` currently call a stubbed request. Swap `fakeAuthRequest`
- * for your real backend (e.g. an Expo API Route) — the contract is simply
- * "return a session token string, or throw on failure".
- */
-import * as SecureStore from 'expo-secure-store';
+import { type Session, type User } from '@supabase/supabase-js';
 import {
   createContext,
   useCallback,
@@ -24,47 +8,21 @@ import {
   useState,
   type PropsWithChildren,
 } from 'react';
-import { Platform } from 'react-native';
 
-const TOKEN_KEY = 'freshcatch.session';
+import { supabase } from '@/lib/supabase';
 
-// Persisted only when the device is unlocked, and never copied to a new device
-// via backup. See SecureStore "keychainAccessible" options in the Expo docs.
-const SECURE_OPTIONS: SecureStore.SecureStoreOptions = {
-  keychainAccessible: SecureStore.WHEN_UNLOCKED_THIS_DEVICE_ONLY,
-};
-
-const storage = {
-  async get(key: string) {
-    if (Platform.OS === 'web') {
-      return typeof localStorage !== 'undefined' ? localStorage.getItem(key) : null;
-    }
-    return SecureStore.getItemAsync(key, SECURE_OPTIONS);
-  },
-  async set(key: string, value: string) {
-    if (Platform.OS === 'web') {
-      localStorage?.setItem(key, value);
-      return;
-    }
-    await SecureStore.setItemAsync(key, value, SECURE_OPTIONS);
-  },
-  async remove(key: string) {
-    if (Platform.OS === 'web') {
-      localStorage?.removeItem(key);
-      return;
-    }
-    await SecureStore.deleteItemAsync(key);
-  },
+type SignUpResult = {
+  needsEmailConfirmation: boolean;
 };
 
 type AuthContextValue = {
-  /** The persisted session token, or null when signed out. */
-  token: string | null;
+  session: Session | null;
+  user: User | null;
   isAuthenticated: boolean;
-  /** True while the persisted session is being restored on launch. */
+  /** True while the persisted Supabase session is being restored on launch. */
   isLoading: boolean;
   signIn: (email: string, password: string) => Promise<void>;
-  signUp: (email: string, password: string) => Promise<void>;
+  signUp: (email: string, password: string) => Promise<SignUpResult>;
   signOut: () => Promise<void>;
 };
 
@@ -78,69 +36,70 @@ export function useAuth() {
   return ctx;
 }
 
-/**
- * Stand-in for a real backend call. Replace with a fetch to your auth endpoint.
- * Throws on "failure" so the screen can surface an error message.
- */
-async function fakeAuthRequest(
-  mode: 'sign-in' | 'sign-up',
-  email: string,
-  _password: string,
-): Promise<string> {
-  await new Promise((resolve) => setTimeout(resolve, 600));
-  // TODO: send credentials over HTTPS to your server, which verifies/hashes the
-  // password and returns a signed session token (JWT). Never trust the client.
-  return `demo-token:${mode}:${email}`;
-}
-
 export function AuthProvider({ children }: PropsWithChildren) {
-  const [token, setToken] = useState<string | null>(null);
+  const [session, setSession] = useState<Session | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     let active = true;
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, nextSession) => {
+      setSession(nextSession);
+      setIsLoading(false);
+    });
+
     (async () => {
       try {
-        const stored = await storage.get(TOKEN_KEY);
-        if (active) setToken(stored);
+        const { data, error } = await supabase.auth.getSession();
+        if (error) throw error;
+        if (active) setSession(data.session);
       } catch {
-        // Ignore restore failures and treat the user as signed out.
+        if (active) setSession(null);
       } finally {
         if (active) setIsLoading(false);
       }
     })();
+
     return () => {
       active = false;
+      subscription.unsubscribe();
     };
   }, []);
 
   const signIn = useCallback(async (email: string, password: string) => {
-    const sessionToken = await fakeAuthRequest('sign-in', email, password);
-    await storage.set(TOKEN_KEY, sessionToken);
-    setToken(sessionToken);
+    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+    if (error) throw error;
+    setSession(data.session);
   }, []);
 
   const signUp = useCallback(async (email: string, password: string) => {
-    const sessionToken = await fakeAuthRequest('sign-up', email, password);
-    await storage.set(TOKEN_KEY, sessionToken);
-    setToken(sessionToken);
+    const { data, error } = await supabase.auth.signUp({ email, password });
+    if (error) throw error;
+    setSession(data.session);
+
+    return {
+      needsEmailConfirmation: !data.session,
+    };
   }, []);
 
   const signOut = useCallback(async () => {
-    await storage.remove(TOKEN_KEY);
-    setToken(null);
+    const { error } = await supabase.auth.signOut();
+    if (error) throw error;
+    setSession(null);
   }, []);
 
   const value = useMemo<AuthContextValue>(
     () => ({
-      token,
-      isAuthenticated: !!token,
+      session,
+      user: session?.user ?? null,
+      isAuthenticated: !!session,
       isLoading,
       signIn,
       signUp,
       signOut,
     }),
-    [token, isLoading, signIn, signUp, signOut],
+    [session, isLoading, signIn, signUp, signOut],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
