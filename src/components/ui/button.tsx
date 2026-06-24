@@ -5,6 +5,7 @@ import {
   Text,
   type PressableProps,
   type StyleProp,
+  type TextStyle,
   type ViewStyle,
 } from 'react-native';
 
@@ -18,6 +19,8 @@ export type ButtonProps = Omit<PressableProps, 'style' | 'children'> & {
   /** Shows a spinner and blocks presses. */
   loading?: boolean;
   style?: StyleProp<ViewStyle>;
+  labelStyle?: StyleProp<TextStyle>;
+  allowFontScaling?: boolean;
 };
 
 /**
@@ -30,6 +33,8 @@ export function Button({
   loading = false,
   disabled,
   style,
+  labelStyle,
+  allowFontScaling,
   ...rest
 }: ButtonProps) {
   const isDisabled = disabled || loading;
@@ -50,7 +55,9 @@ export function Button({
       {loading ? (
         <ActivityIndicator color={isPrimary ? Brand.onPrimary : Brand.primary} />
       ) : (
-        <Text style={[styles.label, isPrimary ? styles.primaryLabel : styles.secondaryLabel]}>
+        <Text
+          allowFontScaling={allowFontScaling}
+          style={[styles.label, isPrimary ? styles.primaryLabel : styles.secondaryLabel, labelStyle]}>
           {label}
         </Text>
       )}

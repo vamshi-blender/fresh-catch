@@ -49,9 +49,13 @@ adb --version
 
 ```powershell
 npm install
-npx expo prebuild --platform android   # generates the native android/ folder
+npx expo prebuild --platform android
+# generates the native android/ folder
+
 cd android
 .\gradlew.bat assembleRelease
+.\gradlew.bat assembleRelease "-PreactNativeArchitectures=arm64-v8a"
+
 ```
 
 The APK is written to:

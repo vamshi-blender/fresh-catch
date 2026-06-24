@@ -22,6 +22,8 @@ export type TextFieldProps = Omit<TextInputProps, 'multiline' | 'numberOfLines'>
    */
   password?: boolean;
   containerStyle?: StyleProp<ViewStyle>;
+  /** Overrides styles on the inner bordered field container. */
+  fieldStyle?: StyleProp<ViewStyle>;
 };
 
 /**
@@ -32,6 +34,7 @@ export function TextField({
   label,
   password = false,
   containerStyle,
+  fieldStyle,
   style,
   editable = true,
   ...rest
@@ -42,7 +45,7 @@ export function TextField({
     <View style={containerStyle}>
       {label ? <Text style={styles.label}>{label}</Text> : null}
 
-      <View style={[styles.field, !editable && styles.disabled]}>
+      <View style={[styles.field, !editable && styles.disabled, fieldStyle]}>
         <TextInput
           style={[styles.input, style]}
           editable={editable}

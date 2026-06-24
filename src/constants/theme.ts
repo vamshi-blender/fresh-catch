@@ -28,20 +28,22 @@ export type ThemeColor = keyof typeof Colors.light & keyof typeof Colors.dark;
  * not theme-dependent, so they live separately from the light/dark `Colors`.
  */
 export const Brand = {
-  /** Primary teal — headings, buttons, links. */
-  primary: '#004643',
+  /** Primary blue — buttons, checkboxes, links. */
+  primary: '#1c77a0',
   text: '#000000',
   /** Text/icon color on top of `primary`. */
   onPrimary: '#FFFFFF',
-  /** Input borders and placeholder text. */
-  border: '#C4C4C4',
-  placeholder: '#C4C4C4',
+  /** Input/card borders. */
+  border: '#e4e4e4',
+  /** Placeholder and hint text. */
+  placeholder: '#7a7d84',
   /** Muted secondary text. */
-  muted: '#757575',
+  muted: '#7a7d84',
   danger: '#e5484d',
-  /** Field and screen backgrounds in the auth design. */
+  /** Field and screen backgrounds. */
   surface: '#FFFFFF',
 } as const;
+
 
 export const Fonts = Platform.select({
   ios: {
@@ -55,9 +57,9 @@ export const Fonts = Platform.select({
     mono: 'ui-monospace',
   },
   default: {
-    sans: 'normal',
+    sans: 'sans-serif',
     serif: 'serif',
-    rounded: 'normal',
+    rounded: 'sans-serif',
     mono: 'monospace',
   },
   web: {
