@@ -26,8 +26,11 @@ function RootNavigator() {
 
   return (
     <Stack screenOptions={{ headerShown: false }}>
-      {/* Main app — authenticated users who have completed onboarding. */}
+      {/* Main app — authenticated users who have completed onboarding.
+          `index` is the standalone landing screen at `/` (no tab bar) and acts
+          as the anchor route; `(app)` holds the tab navigator (e.g. /explore). */}
       <Stack.Protected guard={isAuthenticated && hasCompletedOnboarding}>
+        <Stack.Screen name="index" />
         <Stack.Screen name="(app)" />
       </Stack.Protected>
 
@@ -39,6 +42,8 @@ function RootNavigator() {
       {/* Auth — unauthenticated users. */}
       <Stack.Protected guard={!isAuthenticated}>
         <Stack.Screen name="login" />
+        <Stack.Screen name="phone-login" options={{ animation: 'none' }} />
+        <Stack.Screen name="otp-verify" options={{ animation: 'none' }} />
       </Stack.Protected>
     </Stack>
   );

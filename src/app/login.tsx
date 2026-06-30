@@ -3,6 +3,7 @@ import { SmartPhone01Icon } from '@hugeicons/core-free-icons';
 import { HugeiconsIcon } from '@hugeicons/react-native';
 import { Image } from 'expo-image';
 import { LinearGradient } from 'expo-linear-gradient';
+import { router } from 'expo-router';
 import { useMemo, useState } from 'react';
 import {
   KeyboardAvoidingView,
@@ -449,6 +450,7 @@ export default function LoginScreen() {
                   },
                   pressed && styles.pressed,
                 ]}
+                onPress={() => router.push('/phone-login')}
                 accessibilityRole="button"
                 accessibilityLabel="Sign in with Mobile">
                 <HugeiconsIcon icon={SmartPhone01Icon} size={m.iconSize} color={Brand.muted} />

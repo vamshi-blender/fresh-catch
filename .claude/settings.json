@@ -1,10 +1,11 @@
 {
-  "enabledPlugins": {
-    "expo@claude-plugins-official": true
-  },
   "permissions": {
     "allow": [
-      "mcp__claude_ai_Figma__download_assets"
+      "mcp__claude_ai_Figma__download_assets",
+      "mcp__claude_ai_Figma__get_screenshot"
     ]
+  },
+  "enabledPlugins": {
+    "expo@claude-plugins-official": true
   }
 }
