@@ -15,6 +15,12 @@ This is an [Expo](https://expo.dev) project created with [`create-expo-app`](htt
    ```bash
    npx expo start
    ```
+3. Start the app in tunnel
+
+   ```bash
+   npm run start:tunnel:go
+   ```
+
 
 In the output, you'll find options to open the app in a
 

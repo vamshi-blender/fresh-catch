@@ -21,6 +21,9 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Brand } from '@/constants/theme';
 import { useAuth } from '@/hooks/use-auth';
 
+// TODO REMOVE BEFORE PRODUCTION — enables the "a"/"a" login bypass in ALL builds.
+const DEV_LOGIN_BYPASS = true;
+
 // Login-screen-only tokens (Figma frame 111:205)
 const C = {
   gradientTop: '#a8daf3',
@@ -171,6 +174,19 @@ export default function LoginScreen() {
   }
 
   async function handleSubmit() {
+    // TODO REMOVE BEFORE PRODUCTION — bypass: "a" in both fields skips validation and logs in.
+    if (DEV_LOGIN_BYPASS && email === 'a' && password === 'a') {
+      setError(null);
+      setNotice(null);
+      setSubmitting(true);
+      try {
+        await signIn('a', 'a');
+      } finally {
+        setSubmitting(false);
+      }
+      return;
+    }
+
     const normalized = email.trim().toLowerCase();
     if (!EMAIL_RE.test(normalized)) return setError('Enter a valid email address.');
     if (password.length < MIN_PW)

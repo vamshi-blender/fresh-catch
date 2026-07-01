@@ -39,9 +39,13 @@ export const Brand = {
   placeholder: '#7a7d84',
   /** Muted secondary text. */
   muted: '#7a7d84',
+  /** Tertiary text — section labels, filter chip labels. */
+  textTertiary: '#7c8896',
   danger: '#e5484d',
   /** Field and screen backgrounds. */
   surface: '#FFFFFF',
+  /** Skeleton/placeholder block fill. */
+  skeleton: '#f6f6f6',
 } as const;
 
 
